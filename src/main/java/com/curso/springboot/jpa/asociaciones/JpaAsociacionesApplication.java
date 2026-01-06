@@ -10,6 +10,8 @@ import com.curso.springboot.jpa.asociaciones.entities.Invoice;
 import com.curso.springboot.jpa.asociaciones.repositories.ClientRepository;
 import com.curso.springboot.jpa.asociaciones.repositories.InvoiceRepository;
 
+import jakarta.transaction.Transactional;
+
 @SpringBootApplication
 public class JpaAsociacionesApplication implements CommandLineRunner {
 	
@@ -29,6 +31,7 @@ public class JpaAsociacionesApplication implements CommandLineRunner {
 		manyToOne();
 	}
 	
+	@Transactional
 	public void manyToOne() {
 		
 		Client client = new Client("John","Doe");
@@ -37,8 +40,9 @@ public class JpaAsociacionesApplication implements CommandLineRunner {
 		Invoice invoice = new Invoice("Compras de oficina",220000l);
 		invoice.setClient(client);
 		
-		invoiceRepository.save(invoice);
+		Invoice invoiceDB = invoiceRepository.save(invoice);
 		
+		System.out.println(invoiceDB);
 		
 	}
 
