@@ -1,5 +1,7 @@
 package com.curso.springboot.jpa.asociaciones;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.Scanner;
 
@@ -9,6 +11,7 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
+import com.curso.springboot.jpa.asociaciones.entities.Address;
 import com.curso.springboot.jpa.asociaciones.entities.Client;
 import com.curso.springboot.jpa.asociaciones.entities.Invoice;
 import com.curso.springboot.jpa.asociaciones.repositories.ClientRepository;
@@ -33,10 +36,57 @@ public class JpaAsociacionesApplication implements CommandLineRunner {
 	@Override
 	public void run(String... args) throws Exception {
 		// manyToOne();
-		// findClientById();
-		
-		createInvoice();
+		// findClientById();		
+		// createInvoice();
+		createClientWithAddress();
 	}
+	
+	
+	@Transactional
+	public void createClientWithAddress() {
+		
+		Scanner scanner = new Scanner(System.in);
+		System.out.println("----------Creacion de cliente---------------");
+		System.out.println("Ingrese el nombre del cliente:");
+		String name = scanner.next();
+		System.out.println("Ingrese el apellido del cliente:");
+		String lastname = scanner.next();
+		
+		List<Address> addresses = new ArrayList<>();
+		
+		boolean addAddress = true;
+		
+		while(addAddress == true)
+		{
+			System.out.println("Ingrese la direccion (calle) del cliente:");
+			scanner.nextLine();
+			String street = scanner.nextLine();
+			System.out.println("Ingrese la direccion (numero) del cliente:");
+			Integer number = scanner.nextInt();
+			
+			Address address = new Address(street,number);
+			addresses.add(address);
+			
+			System.out.println("desea ingresar otra direccion(y or n)?:");
+			String otherAddress = scanner.next();
+			
+			addAddress = (otherAddress.equals("y")) ? true : false;
+			
+		}	
+		
+		Client client = new Client(name,lastname);
+		client.setAddresses(addresses);
+		
+		Client clientDB = clientRepository.save(client);
+		
+		System.out.println(clientDB);
+		
+		scanner.close();
+		
+	}
+	
+	
+	//pendiente probar la eliminacion de un cliente
 	
 	@Transactional
 	public void manyToOne() {
