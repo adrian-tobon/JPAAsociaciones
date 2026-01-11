@@ -38,7 +38,10 @@ public class JpaAsociacionesApplication implements CommandLineRunner {
 		// manyToOne();
 		// findClientById();		
 		// createInvoice();
-		createClientWithAddress();
+		//  createClientWithAddress();
+		// deleteClientWithAddress();
+		findClientByIdWithAddresses();
+		
 	}
 	
 	
@@ -86,7 +89,30 @@ public class JpaAsociacionesApplication implements CommandLineRunner {
 	}
 	
 	
-	//pendiente probar la eliminacion de un cliente
+	@Transactional
+	public void deleteClientWithAddress() {
+		
+		Scanner scanner = new Scanner(System.in);
+		System.out.println("----------Eliminacion de cliente de cliente---------------");
+		System.out.println("Ingrese el id del cliente:");
+		Long id = scanner.nextLong();
+		
+		
+		Optional<Client> client = clientRepository.findById(id);
+		
+		if(client.isPresent())
+		{
+			clientRepository.deleteById(id);
+			System.out.println("Cliente eliminado de forma satisfactoria");
+			
+		}else {
+			System.out.println("el cliente no existe, no se puede eliminar");
+		}
+			
+		
+		scanner.close();
+	
+	}
 	
 	@Transactional
 	public void manyToOne() {
@@ -126,6 +152,27 @@ public class JpaAsociacionesApplication implements CommandLineRunner {
 		}else {
 			System.out.println("cliente no existe");
 		}
+		
+		scanner.close();
+	
+	}
+	
+	@Transactional
+	public void findClientByIdWithAddresses() {
+	
+		Scanner scanner = new Scanner(System.in);
+		System.out.println("----------Busqueda de cliente---------------");
+		System.out.println("Ingrese el id del cliente:");
+		Long id = scanner.nextLong();
+		
+		Optional<Client> optClient = clientRepository.findById(id);
+		
+		optClient.ifPresent(client ->{
+			client.getAddresses().forEach( address -> {
+				System.out.println(address);
+			});	
+			
+		});
 		
 		scanner.close();
 	
