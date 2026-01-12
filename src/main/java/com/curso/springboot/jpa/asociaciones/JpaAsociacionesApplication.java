@@ -176,8 +176,7 @@ public class JpaAsociacionesApplication implements CommandLineRunner {
 		System.out.println("----------Eliminacion de cliente de cliente---------------");
 		System.out.println("Ingrese el id del cliente:");
 		Long id = scanner.nextLong();
-		
-		
+				
 		//Optional<Client> optClient = clientRepository.findById(id);
 		Optional<Client> optClient = clientRepository.getClientById(id);
 		
