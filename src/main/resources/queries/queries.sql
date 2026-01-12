@@ -28,10 +28,26 @@ alter table db_jpa_relationship.invoices rename column client_id to id_client;
 
 create table db_jpa_relationship.addresses (id bigint not null auto_increment, number integer, street varchar(255), primary key (id)) engine=InnoDB;
 create table db_jpa_relationship..clients_addresses (client_id bigint not null, addresses_id bigint not null) engine=InnoDB;
-alter table db_jpa_relationship.clients_addresses add constraint UKd9liq56jlec2x8nipbxxd705n unique (addresses_id)
-alter table db_jpa_relationship.clients_addresses add constraint FKejf92g3ybg34aogu7o2tbtgca foreign key (addresses_id) references addresses (id)
-alter table db_jpa_relationship.clients_addresses add constraint FK12sx33jn6tq0mgjvmic1696cs foreign key (client_id) references clients (id)
+alter table db_jpa_relationship.clients_addresses add constraint UKd9liq56jlec2x8nipbxxd705n unique (addresses_id);
+alter table db_jpa_relationship.clients_addresses add constraint FKejf92g3ybg34aogu7o2tbtgca foreign key (addresses_id) references addresses (id);
+alter table db_jpa_relationship.clients_addresses add constraint FK12sx33jn6tq0mgjvmic1696cs foreign key (client_id) references clients (id);
 
 
-create table db_jpa_relationship.addresses (id bigint not null auto_increment, number integer, street varchar(255), client_id bigint, primary key (id)) engine=InnoDB
-alter table db_jpa_relationship.addresses add constraint FKrf3c1s9gxxx0wubkv5maokv9y foreign key (client_id) references clients (id)
+create table db_jpa_relationship.addresses (id bigint not null auto_increment, number integer, street varchar(255), client_id bigint, primary key (id)) engine=InnoDB;
+alter table db_jpa_relationship.addresses add constraint FKrf3c1s9gxxx0wubkv5maokv9y foreign key (client_id) references clients (id);
+
+ALTER TABLE db_jpa_relationship.clients_addresses RENAME TO  db_jpa_relationship.addresses_by_clients;
+
+ALTER TABLE `db_jpa_relationship`.`addresses_by_clients` 
+DROP FOREIGN KEY `FK12sx33jn6tq0mgjvmic1696cs`,
+DROP FOREIGN KEY `FKejf92g3ybg34aogu7o2tbtgca`;
+ALTER TABLE `db_jpa_relationship`.`addresses_by_clients` 
+CHANGE COLUMN `client_id` `id_client` BIGINT NOT NULL ,
+CHANGE COLUMN `addresses_id` `id_address` BIGINT NOT NULL ;
+ALTER TABLE `db_jpa_relationship`.`addresses_by_clients` 
+ADD CONSTRAINT `FK12sx33jn6tq0mgjvmic1696cs`
+  FOREIGN KEY (`id_client`)
+  REFERENCES `db_jpa_relationship`.`clients` (`id`),
+ADD CONSTRAINT `FKejf92g3ybg34aogu7o2tbtgca`
+  FOREIGN KEY (`id_address`)
+  REFERENCES `db_jpa_relationship`.`addresses` (`id`);

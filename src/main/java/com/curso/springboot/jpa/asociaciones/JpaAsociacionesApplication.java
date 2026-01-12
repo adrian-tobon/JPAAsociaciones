@@ -36,13 +36,65 @@ public class JpaAsociacionesApplication implements CommandLineRunner {
 	@Override
 	public void run(String... args) throws Exception {
 		// manyToOne();
-		// findClientById();		
+		 findClientById();		
 		// createInvoice();
-		//  createClientWithAddress();
+		// createClientWithAddress();
 		// deleteClientWithAddress();
-		findClientByIdWithAddresses();
+		// findClientByIdWithAddresses();
+		// addAddresesExitingClient();
+		// deleteAddress();
 		
 	}
+	
+	@Transactional
+	public void addAddresesExitingClient()
+	{
+		Scanner scanner = new Scanner(System.in);
+		System.out.println("----------Eliminacion de cliente de cliente---------------");
+		System.out.println("Ingrese el id del cliente:");
+		Long id = scanner.nextLong();
+		
+		//Optional<Client> optClient = clientRepository.findById(id);
+		Optional<Client> optClient = clientRepository.getClientById(id);
+		
+		optClient.ifPresentOrElse(client -> {
+			
+			System.out.println(client);
+			List<Address> addresses = new ArrayList<>();
+			boolean addAddress = true;
+
+			while (addAddress == true) {
+				System.out.println("Ingrese la direccion (calle) del cliente:");
+				scanner.nextLine();
+				String street = scanner.nextLine();
+				System.out.println("Ingrese la direccion (numero) del cliente:");
+				Integer number = scanner.nextInt();
+
+				Address address = new Address(street, number);
+				addresses.add(address);
+
+				System.out.println("desea ingresar otra direccion(y or n)?:");
+				String otherAddress = scanner.next();
+
+				addAddress = (otherAddress.equals("y")) ? true : false;
+
+			}
+
+			client.setAddresses(addresses);
+
+			Client clientDB = clientRepository.save(client);
+
+			System.out.println("cliente actualizado correctamente");
+			System.out.println(clientDB);
+
+		}, () -> {
+			System.out.println("cliente no existe");
+		});
+		
+		scanner.close();
+		
+	}
+	
 	
 	
 	@Transactional
@@ -98,7 +150,8 @@ public class JpaAsociacionesApplication implements CommandLineRunner {
 		Long id = scanner.nextLong();
 		
 		
-		Optional<Client> client = clientRepository.findById(id);
+		//Optional<Client> client = clientRepository.findById(id);
+		Optional<Client> client = clientRepository.getClientById(id);
 		
 		if(client.isPresent())
 		{
@@ -113,6 +166,52 @@ public class JpaAsociacionesApplication implements CommandLineRunner {
 		scanner.close();
 	
 	}
+	
+	
+	
+	@Transactional
+	public void deleteAddress() {
+		
+		Scanner scanner = new Scanner(System.in);
+		System.out.println("----------Eliminacion de cliente de cliente---------------");
+		System.out.println("Ingrese el id del cliente:");
+		Long id = scanner.nextLong();
+		
+		
+		//Optional<Client> optClient = clientRepository.findById(id);
+		Optional<Client> optClient = clientRepository.getClientById(id);
+		
+		optClient.ifPresentOrElse(client -> {
+
+			if (client.getAddresses().size() > 0) {
+
+				System.out.println("Direcciones:\n ");
+
+				for (int i = 0; i < client.getAddresses().size(); i++) {
+
+					System.out.println(" - " + (i + 1) + ": " + client.getAddresses().get(i).toString());
+
+				}
+				System.out.println("Indique cual direccion desea eliminar:");
+				int index = scanner.nextInt();
+
+				client.getAddresses().remove(index - 1);				
+				Client clientDB = clientRepository.save(client);				
+				System.out.println("direccion eliminada correctamente");				
+				System.out.println(clientDB);
+				
+			} else {
+				System.out.println("cliente no tiene direcciones");
+			}
+
+		}, () -> {
+			System.out.println("cliente no existe");
+		});			
+		
+		scanner.close();
+	
+	}
+	
 	
 	@Transactional
 	public void manyToOne() {
@@ -138,7 +237,8 @@ public class JpaAsociacionesApplication implements CommandLineRunner {
 		System.out.println("Ingrese el id del cliente:");
 		Long id = scanner.nextLong();
 		
-		Optional<Client> optClient = clientRepository.findById(id);
+		//Optional<Client> optClient = clientRepository.findById(id);		
+		Optional<Client> optClient = clientRepository.getClientById(id);
 		
 		/*optClient.ifPresentOrElse(c -> {
 				System.out.println(c);
@@ -165,7 +265,8 @@ public class JpaAsociacionesApplication implements CommandLineRunner {
 		System.out.println("Ingrese el id del cliente:");
 		Long id = scanner.nextLong();
 		
-		Optional<Client> optClient = clientRepository.findById(id);
+		//Optional<Client> optClient = clientRepository.findById(id);
+		Optional<Client> optClient = clientRepository.getClientById(id);
 		
 		optClient.ifPresent(client ->{
 			client.getAddresses().forEach( address -> {
@@ -186,7 +287,8 @@ public class JpaAsociacionesApplication implements CommandLineRunner {
 		System.out.println("Ingrese el id del cliente:");
 		Long id = scanner.nextLong();
 		
-		Optional<Client> optClient = clientRepository.findById(id);	
+		//Optional<Client> optClient = clientRepository.findById(id);
+		Optional<Client> optClient = clientRepository.getClientById(id);
 		
 		if(optClient.isPresent()) {
 			Client client = optClient.orElseThrow();
