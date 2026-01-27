@@ -54,8 +54,8 @@ public class JpaAsociacionesApplication implements CommandLineRunner {
 		System.out.println("Ingrese el id del cliente:");
 		Long id = scanner.nextLong();
 		
-		//Optional<Client> optClient = clientRepository.findById(id);
-		Optional<Client> optClient = clientRepository.getClientById(id);
+		Optional<Client> optClient = clientRepository.findById(id);
+		//Optional<Client> optClient = clientRepository.getClientById(id);
 		
 		optClient.ifPresentOrElse(client -> {
 			
@@ -150,8 +150,8 @@ public class JpaAsociacionesApplication implements CommandLineRunner {
 		Long id = scanner.nextLong();
 		
 		
-		//Optional<Client> client = clientRepository.findById(id);
-		Optional<Client> client = clientRepository.getClientById(id);
+		Optional<Client> client = clientRepository.findById(id);
+		//Optional<Client> client = clientRepository.getClientById(id);
 		
 		if(client.isPresent())
 		{
@@ -177,8 +177,8 @@ public class JpaAsociacionesApplication implements CommandLineRunner {
 		System.out.println("Ingrese el id del cliente:");
 		Long id = scanner.nextLong();
 				
-		//Optional<Client> optClient = clientRepository.findById(id);
-		Optional<Client> optClient = clientRepository.getClientById(id);
+		Optional<Client> optClient = clientRepository.findById(id);
+		//Optional<Client> optClient = clientRepository.getClientById(id);
 		
 		optClient.ifPresentOrElse(client -> {
 
@@ -236,8 +236,8 @@ public class JpaAsociacionesApplication implements CommandLineRunner {
 		System.out.println("Ingrese el id del cliente:");
 		Long id = scanner.nextLong();
 		
-		//Optional<Client> optClient = clientRepository.findById(id);		
-		Optional<Client> optClient = clientRepository.getClientById(id);
+		Optional<Client> optClient = clientRepository.findById(id);		
+		//Optional<Client> optClient = clientRepository.getClientById(id);
 		
 		/*optClient.ifPresentOrElse(c -> {
 				System.out.println(c);
@@ -264,8 +264,8 @@ public class JpaAsociacionesApplication implements CommandLineRunner {
 		System.out.println("Ingrese el id del cliente:");
 		Long id = scanner.nextLong();
 		
-		//Optional<Client> optClient = clientRepository.findById(id);
-		Optional<Client> optClient = clientRepository.getClientById(id);
+		Optional<Client> optClient = clientRepository.findById(id);
+		//Optional<Client> optClient = clientRepository.getClientById(id);
 		
 		optClient.ifPresent(client ->{
 			client.getAddresses().forEach( address -> {
@@ -286,8 +286,8 @@ public class JpaAsociacionesApplication implements CommandLineRunner {
 		System.out.println("Ingrese el id del cliente:");
 		Long id = scanner.nextLong();
 		
-		//Optional<Client> optClient = clientRepository.findById(id);
-		Optional<Client> optClient = clientRepository.getClientById(id);
+		Optional<Client> optClient = clientRepository.findById(id);
+		//Optional<Client> optClient = clientRepository.getClientById(id);
 		
 		if(optClient.isPresent()) {
 			Client client = optClient.orElseThrow();

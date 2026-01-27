@@ -9,7 +9,7 @@ import com.curso.springboot.jpa.asociaciones.entities.Client;
 
 public interface ClientRepository extends CrudRepository<Client, Long>{
 	
-	@Query("select c from Client c  join fetch c.addresses where c.id = ?1")
+	@Query("select c from Client c join fetch c.addresses where c.id = ?1")
 	Optional<Client> getClientById(Long id);
 
 }

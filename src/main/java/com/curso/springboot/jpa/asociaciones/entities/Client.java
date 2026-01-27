@@ -26,7 +26,7 @@ public class Client {
 	private String name;
 	private String lastname;
 	
-	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true/*, fetch = FetchType.EAGER*/)
+	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
 	//@JoinColumn(name = "client_id")
 	@JoinTable(name = "addresses_by_clients", 
 			   joinColumns = @JoinColumn(name = "id_client"),
@@ -34,9 +34,13 @@ public class Client {
 			   uniqueConstraints = @UniqueConstraint(columnNames = {"id_address"}))
 	private List<Address> addresses;	
 	
+	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER, mappedBy = "client")
+	private List<Invoice> invoices;
+	
 	
 	public Client() {
 		addresses = new ArrayList<>();
+		invoices = new ArrayList<>();
 	
 	}
 	
@@ -75,9 +79,18 @@ public class Client {
 		this.addresses = addresses;
 	}
 
+		
+	public List<Invoice> getInvoices() {
+		return invoices;
+	}
+
+	public void setInvoices(List<Invoice> invoices) {
+		this.invoices = invoices;
+	}
+
 	@Override
 	public String toString() {
-		return "{id=" + id + ", name=" + name + ", lastname=" + lastname + ", addresses= " + addresses + "}";
+		return "{id=" + id + ", name=" + name + ", lastname=" + lastname + ", addresses= " + addresses + ", invoices= "  + invoices +  "}";
 	}
 	
 
