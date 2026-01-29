@@ -1,5 +1,7 @@
 package com.curso.springboot.jpa.asociaciones.entities;
 
+import java.util.Objects;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -63,6 +65,29 @@ public class Invoice {
 
 	public void setClient(Client client) {
 		this.client = client;
+	}
+
+	
+	
+	
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(description, id, total);
+	}
+
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Invoice other = (Invoice) obj;
+		return Objects.equals(description, other.description) && Objects.equals(id, other.id)
+				&& Objects.equals(total, other.total);
 	}
 
 

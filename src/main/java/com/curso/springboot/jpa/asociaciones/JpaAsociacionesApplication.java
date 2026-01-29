@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Scanner;
 
-import org.hibernate.internal.build.AllowSysOut;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
@@ -14,6 +13,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import com.curso.springboot.jpa.asociaciones.entities.Address;
 import com.curso.springboot.jpa.asociaciones.entities.Client;
 import com.curso.springboot.jpa.asociaciones.entities.Invoice;
+import com.curso.springboot.jpa.asociaciones.repositories.AddressRepository;
 import com.curso.springboot.jpa.asociaciones.repositories.ClientRepository;
 import com.curso.springboot.jpa.asociaciones.repositories.InvoiceRepository;
 
@@ -26,6 +26,9 @@ public class JpaAsociacionesApplication implements CommandLineRunner {
 	private ClientRepository clientRepository;
 	
 	@Autowired
+	private AddressRepository addressRepository;
+	
+	@Autowired
 	private InvoiceRepository invoiceRepository;
 
 	public static void main(String[] args) {
@@ -36,13 +39,15 @@ public class JpaAsociacionesApplication implements CommandLineRunner {
 	@Override
 	public void run(String... args) throws Exception {
 		// manyToOne();
-		 findClientById();		
+		// findClientById();		
 		// createInvoice();
 		// createClientWithAddress();
 		// deleteClientWithAddress();
 		// findClientByIdWithAddresses();
 		// addAddresesExitingClient();
 		// deleteAddress();
+		 deleteInvoice(); 
+		 
 		
 	}
 	
@@ -173,7 +178,7 @@ public class JpaAsociacionesApplication implements CommandLineRunner {
 	public void deleteAddress() {
 		
 		Scanner scanner = new Scanner(System.in);
-		System.out.println("----------Eliminacion de cliente de cliente---------------");
+		System.out.println("----------Eliminacion de direcciones de cliente---------------");
 		System.out.println("Ingrese el id del cliente:");
 		Long id = scanner.nextLong();
 				
@@ -185,22 +190,79 @@ public class JpaAsociacionesApplication implements CommandLineRunner {
 			if (client.getAddresses().size() > 0) {
 
 				System.out.println("Direcciones:\n ");
-
-				for (int i = 0; i < client.getAddresses().size(); i++) {
-
-					System.out.println(" - " + (i + 1) + ": " + client.getAddresses().get(i).toString());
+			
+				int i = 0;
+				
+				for (Address address : client.getAddresses())
+				{
+					
+					System.out.println(" - " + address.toString());
+					i++;
 
 				}
-				System.out.println("Indique cual direccion desea eliminar:");
-				int index = scanner.nextInt();
-
-				client.getAddresses().remove(index - 1);				
-				Client clientDB = clientRepository.save(client);				
-				System.out.println("direccion eliminada correctamente");				
-				System.out.println(clientDB);
 				
+				System.out.println("Indique cual direccion desea eliminar:");
+				Long idAddress = scanner.nextLong();
+								
+				Optional<Address> optAddress = addressRepository.findById(idAddress);
+				
+				optAddress.ifPresentOrElse(address -> {
+					client.getAddresses().remove(address);			
+					Client clientDB = clientRepository.save(client);				
+					System.out.println("direccion eliminada correctamente");				
+					System.out.println(clientDB);
+					
+				},() -> System.out.println("la opcion seleccionada no existe "));	
 			} else {
 				System.out.println("cliente no tiene direcciones");
+			}
+
+		}, () -> {
+			System.out.println("cliente no existe");
+		});			
+		
+		scanner.close();
+	
+	}
+	
+	@Transactional
+	public void deleteInvoice() { //en el set no funciona la eliminacion por indice
+		
+		Scanner scanner = new Scanner(System.in);
+		System.out.println("----------Eliminacion de facturas de cliente---------------");
+		System.out.println("Ingrese el id del cliente:");
+		Long id = scanner.nextLong();
+				
+		Optional<Client> optClient = clientRepository.findById(id);
+		//Optional<Client> optClient = clientRepository.getClientById(id);
+		
+		optClient.ifPresentOrElse(client -> {
+
+			if (client.getInvoices().size() > 0) {
+
+				System.out.println("Facturas:\n ");				
+				
+				for (Invoice invoice : client.getInvoices())
+				{
+					System.out.println(" - " +  invoice.toString());			
+
+				}
+				
+				System.out.println("Indique el id de la factura que desea eliminar:");
+				Long idInvoice = scanner.nextLong();
+				
+				Optional<Invoice> optInvoice = invoiceRepository.findById(idInvoice);
+				
+				optInvoice.ifPresentOrElse(invoice -> {
+					client.getInvoices().remove(invoice);			
+					Client clientDB = clientRepository.save(client);				
+					System.out.println("factura eliminada correctamente");				
+					System.out.println(clientDB);
+					
+				},() -> System.out.println("la opcion seleccionada no existe "));				
+				
+			} else {
+				System.out.println("cliente no tiene facturas");
 			}
 
 		}, () -> {
@@ -290,21 +352,33 @@ public class JpaAsociacionesApplication implements CommandLineRunner {
 		//Optional<Client> optClient = clientRepository.getClientById(id);
 		
 		if(optClient.isPresent()) {
-			Client client = optClient.orElseThrow();
-			System.out.println(client);
-			System.out.println("----------Creacion de factura---------------");
-			System.out.println("Ingrese la descripcion de la factura:");
- 			scanner.nextLine();
- 			String description = scanner.nextLine();
- 			System.out.println("Ingrese el total de la factura:");
- 			Long total = scanner.nextLong();
 			
-			Invoice invoice = new Invoice(description,total);
-			invoice.setClient(client);
+			boolean addInvoices = true;
+					
+			while(addInvoices == true) {		
 			
-			Invoice invoiceDB = invoiceRepository.save(invoice);
-			System.out.println("Factura creada");
-			System.out.println(invoiceDB);
+				Client client = optClient.orElseThrow();
+				System.out.println(client);
+				System.out.println("----------Creacion de factura---------------");
+				System.out.println("Ingrese la descripcion de la factura:");
+	 			scanner.nextLine();
+	 			String description = scanner.nextLine();
+	 			System.out.println("Ingrese el total de la factura:");
+	 			Long total = scanner.nextLong();
+				
+				Invoice invoice = new Invoice(description,total);
+				invoice.setClient(client);
+				
+				Invoice invoiceDB = invoiceRepository.save(invoice);
+				System.out.println("Factura creada");
+				System.out.println(invoiceDB);
+				
+				System.out.println("Desea agregar otra factura? (y o n):");
+	 			String otherInvoice = scanner.next();
+	 			
+	 			addInvoices = (otherInvoice.equals("y")) ? true : false;
+				
+			}
 			
 		}else {
 			System.out.println("Cliente no existe");
