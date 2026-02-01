@@ -66,6 +66,7 @@ public class JpaAsociacionesApplication implements CommandLineRunner {
 		Long id = scanner.nextLong();
 		
 		Optional<Client> optClient = clientRepository.findById(id);
+		//Optional<Client> optClient = clientRepository.getClientById(id);
 		
 		optClient.ifPresentOrElse(client ->{
 			System.out.println("----------El cliente existe---------------");
