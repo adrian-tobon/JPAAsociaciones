@@ -14,6 +14,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 
@@ -39,6 +40,10 @@ public class Client {
 	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER, mappedBy = "client")
 	private List<Invoice> invoices;
 	
+		
+	@OneToOne(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER,mappedBy = "client")
+	//@JoinColumn(name="id_client_details")
+	private ClientDetail details;
 	
 	public Client() {
 		addresses = new ArrayList<>();
@@ -89,10 +94,19 @@ public class Client {
 	public void setInvoices(List<Invoice> invoices) {
 		this.invoices = invoices;
 	}
+	
+	
+	public ClientDetail getDetails() {
+		return details;
+	}
+
+	public void setDetails(ClientDetail details) {
+		this.details = details;
+	}
 
 	@Override
 	public String toString() {
-		return "{id=" + id + ", name=" + name + ", lastname=" + lastname + ", addresses= " + addresses + ", invoices= "  + invoices +  "}";
+		return "{id=" + id + ", name=" + name + ", lastname=" + lastname + ", addresses= " + addresses + ", invoices= "  + invoices +  ", details= "  + details +"}";
 	}
 	
 

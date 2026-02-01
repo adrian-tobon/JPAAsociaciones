@@ -12,8 +12,10 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 import com.curso.springboot.jpa.asociaciones.entities.Address;
 import com.curso.springboot.jpa.asociaciones.entities.Client;
+import com.curso.springboot.jpa.asociaciones.entities.ClientDetail;
 import com.curso.springboot.jpa.asociaciones.entities.Invoice;
 import com.curso.springboot.jpa.asociaciones.repositories.AddressRepository;
+import com.curso.springboot.jpa.asociaciones.repositories.ClientDetailsRepository;
 import com.curso.springboot.jpa.asociaciones.repositories.ClientRepository;
 import com.curso.springboot.jpa.asociaciones.repositories.InvoiceRepository;
 
@@ -30,6 +32,9 @@ public class JpaAsociacionesApplication implements CommandLineRunner {
 	
 	@Autowired
 	private InvoiceRepository invoiceRepository;
+	
+	@Autowired
+	private ClientDetailsRepository clientDetailRepository;
 
 	public static void main(String[] args) {
 		SpringApplication.run(JpaAsociacionesApplication.class, args);
@@ -46,8 +51,46 @@ public class JpaAsociacionesApplication implements CommandLineRunner {
 		// findClientByIdWithAddresses();
 		// addAddresesExitingClient();
 		// deleteAddress();
-		 deleteInvoice(); 
+		// deleteInvoice();
+		createClientDetail();
 		 
+		
+	}
+	
+	@Transactional
+	public void createClientDetail() {
+		
+		Scanner scanner = new Scanner(System.in);
+		System.out.println("----------Creacion detalle cliente---------------");
+		System.out.println("Ingrese el id del cliente:");
+		Long id = scanner.nextLong();
+		
+		Optional<Client> optClient = clientRepository.findById(id);
+		
+		optClient.ifPresentOrElse(client ->{
+			System.out.println("----------El cliente existe---------------");
+			System.out.println("Ingrese si el cliente es premium(y o n):");
+			String Premium = scanner.next();
+			
+			boolean isPremium = (Premium.equals("y")) ? true : false;
+			
+			System.out.println("Ingrese la cantidad de puntos del cliente:");
+			int points = scanner.nextInt();
+			
+			ClientDetail clientDetail = new ClientDetail(isPremium,points);
+			//clientDetail.setClient(client);
+			//clientDetailRepository.save(clientDetail);
+			
+			client.setDetails(clientDetail);
+			Client clientDB = clientRepository.save(client);
+
+			System.out.println("cliente actualizado correctamente");
+			System.out.println(clientDB);
+			
+		},() -> System.out.println("El cliente no existe"));
+		
+		
+		scanner.close();
 		
 	}
 	
