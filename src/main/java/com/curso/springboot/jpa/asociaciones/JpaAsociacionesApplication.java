@@ -2,6 +2,7 @@ package com.curso.springboot.jpa.asociaciones;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Scanner;
 
@@ -13,11 +14,15 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import com.curso.springboot.jpa.asociaciones.entities.Address;
 import com.curso.springboot.jpa.asociaciones.entities.Client;
 import com.curso.springboot.jpa.asociaciones.entities.ClientDetail;
+import com.curso.springboot.jpa.asociaciones.entities.Course;
 import com.curso.springboot.jpa.asociaciones.entities.Invoice;
+import com.curso.springboot.jpa.asociaciones.entities.Student;
 import com.curso.springboot.jpa.asociaciones.repositories.AddressRepository;
 import com.curso.springboot.jpa.asociaciones.repositories.ClientDetailsRepository;
 import com.curso.springboot.jpa.asociaciones.repositories.ClientRepository;
+import com.curso.springboot.jpa.asociaciones.repositories.CourseRepository;
 import com.curso.springboot.jpa.asociaciones.repositories.InvoiceRepository;
+import com.curso.springboot.jpa.asociaciones.repositories.StudentRepository;
 
 import jakarta.transaction.Transactional;
 
@@ -35,6 +40,12 @@ public class JpaAsociacionesApplication implements CommandLineRunner {
 	
 	@Autowired
 	private ClientDetailsRepository clientDetailRepository;
+	
+	@Autowired
+	private StudentRepository studentRepository;
+	
+	@Autowired
+	private CourseRepository courseRepository;
 
 	public static void main(String[] args) {
 		SpringApplication.run(JpaAsociacionesApplication.class, args);
@@ -52,8 +63,196 @@ public class JpaAsociacionesApplication implements CommandLineRunner {
 		// addAddresesExitingClient();
 		// deleteAddress();
 		// deleteInvoice();
-		createClientDetail();
+		// createClientDetail();
+		
+		// addCourseToStudent();
+		// deleteStudent();
+		 deleteCourseFromStudent();
 		 
+		
+	}
+	
+	@Transactional
+	public void deleteStudent() {
+		Scanner scanner = new Scanner(System.in);
+		System.out.println("----------Eliminacion estudiante---------------");
+		System.out.println("Ingrese el id del estudiante:");
+		Long id = scanner.nextLong();
+		
+		Optional<Student> optStudent = studentRepository.findById(id);
+		
+		optStudent.ifPresentOrElse(student -> {
+			
+			studentRepository.delete(student);
+			System.out.println("Estudiante eliminado");
+			
+			
+		}, () -> System.out.println("Estudiante no existe"));
+		
+		
+		scanner.close();
+		
+	}
+	
+	@Transactional
+	public void deleteCourseFromStudent() {
+		Scanner scanner = new Scanner(System.in);
+		System.out.println("----------Eliminacion curso de estudiante---------------");
+		System.out.println("Ingrese el id del estudiante:");
+		Long id = scanner.nextLong();
+		
+		Optional<Student> optStudent = studentRepository.findById(id);
+		
+		optStudent.ifPresentOrElse(student -> {
+			System.out.println(student);
+			
+			System.out.println("Ingrese el id del curso a eliminar:");
+			Long idCourse = scanner.nextLong();		
+			
+			
+			boolean available = student.getCourses().stream().anyMatch(c -> c.getId().equals(idCourse));
+			
+			if(available == true)
+			{
+				
+				Optional<Course> optCourse = courseRepository.findById(idCourse);
+				
+				optCourse.ifPresentOrElse(course -> {
+				
+						student.getCourses().remove(course);
+						Student studentDb = studentRepository.save(student);
+						System.out.println(studentDb);
+					
+					
+					
+				}, () -> System.out.println("El curso no existe"));				
+				
+				
+			}else {
+				System.out.println("El estudiante no tiene asignado este curso");
+				
+			}		
+			
+		}, () -> System.out.println("Estudiante no existe"));
+		
+		
+		scanner.close();
+		
+	}
+	
+	
+	
+	@Transactional
+	public void addCourseToStudent() {
+		Scanner scanner = new Scanner(System.in);
+		System.out.println("----------Creacion estudiante---------------");
+		System.out.println("Ingrese el id del estudiante:");
+		Long id = scanner.nextLong();
+		
+		
+		Optional<Student> optStudent = studentRepository.findById(id);
+		
+		optStudent.ifPresentOrElse(student -> {
+			System.out.println(student);
+			
+			List<Course> studentCourses = student.getCourses();
+			List<Long> courseIds = new ArrayList<>();
+			
+			for(Course course: studentCourses) {
+				courseIds.add(course.getId());
+			}
+			
+			List<Course> availableCourses = (List<Course>) courseRepository.findByIdNotIn(courseIds);
+			System.out.println("----------cursos disponibles---------------");
+			availableCourses.forEach(System.out::println);
+			
+			boolean addMoreCourses = true;
+			List<Course> coursesAdded = new ArrayList<>();
+			
+			while(addMoreCourses == true) {
+				
+				System.out.println("Ingrese el id del curso deseado:");
+				Long idCourse = scanner.nextLong();
+				
+				boolean available = availableCourses.stream().anyMatch(c -> c.getId().equals(idCourse));
+				
+				if(available == true) {
+					Optional<Course> optCourse = courseRepository.findById(idCourse);
+					optCourse.ifPresentOrElse(course -> {
+						
+						coursesAdded.add(course);
+						
+					}, ()->System.out.println("No existe un curso con ese Id"));
+					
+										
+				}else {
+					System.out.println("Este curso no esta disponible, ya fue tomado por este estudiante");	
+					
+				}
+				
+				System.out.println("Desea agregar otro curso(y o n):");
+				String addMore = scanner.next();
+				
+				addMoreCourses = (addMore.equals("y")) ? true : false;
+				
+			}
+			
+			coursesAdded.stream().forEach(newCourse -> {				
+				student.getCourses().add(newCourse);
+			});
+			
+			Student studentDb = studentRepository.save(student);
+			System.out.println(studentDb);		
+			
+			
+		}, ()->System.out.println("estudiante no existe"));
+		
+		
+		scanner.close();
+		
+	}
+	
+	@Transactional
+	public void addStudent() {
+		Scanner scanner = new Scanner(System.in);
+		System.out.println("----------Creacion estudiante---------------");
+		System.out.println("Ingrese el nombre del estudiante:");
+		String name  = scanner.next();
+		
+		System.out.println("Ingrese el apellido del estudiante:");
+		String lastname  = scanner.next();
+		
+		Student student = new Student(name,lastname);
+		
+		Student studentDb = studentRepository.save(student);
+		
+		System.out.println(studentDb);
+		
+		scanner.close();
+	}
+	
+	
+	@Transactional
+	public void addCourse() {
+		
+		Scanner scanner = new Scanner(System.in);
+		System.out.println("----------Creacion curso---------------");
+		System.out.println("Ingrese el nombre del curso:");
+		String name  = scanner.next();
+		
+		System.out.println("Ingrese el contenido del curso:");
+		String content  = scanner.next();
+		
+		System.out.println("Ingrese el nombre del instructor del curso:");
+		String instructor  = scanner.next();
+		
+		Course course = new Course(name,instructor,content);
+		
+		Course courseDb = courseRepository.save(course);
+		
+		System.out.println(courseDb);
+		
+		scanner.close();
 		
 	}
 	
