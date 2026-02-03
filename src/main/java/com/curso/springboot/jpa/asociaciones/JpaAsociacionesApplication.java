@@ -66,10 +66,38 @@ public class JpaAsociacionesApplication implements CommandLineRunner {
 		// createClientDetail();
 		
 		// addCourseToStudent();
-		// deleteStudent();
-		 deleteCourseFromStudent();
+		 deleteStudent();
+		// deleteCourseFromStudent();
+		// deleteCourse();
 		 
 		
+	}
+	
+	@Transactional
+	public void deleteCourse() {
+		
+		Scanner scanner = new Scanner(System.in);
+		System.out.println("----------Eliminacio curso---------------");
+		System.out.println("Ingrese el id del curso:");
+		Long id  = scanner.nextLong();
+		
+		Optional<Course> optCourse = courseRepository.findById(id);
+		
+		optCourse.ifPresentOrElse(course -> {
+			
+			course.getStudents().stream().forEach(student ->{
+				student.getCourses().remove(course);
+				Student studentDb = studentRepository.save(student);
+				System.out.println(studentDb);
+				
+			});
+			
+			courseRepository.delete(course);
+			
+			
+		}, ()->System.out.println("Este curso no existe"));		
+		
+		scanner.close();		
 	}
 	
 	@Transactional
@@ -82,6 +110,14 @@ public class JpaAsociacionesApplication implements CommandLineRunner {
 		Optional<Student> optStudent = studentRepository.findById(id);
 		
 		optStudent.ifPresentOrElse(student -> {
+			
+			student.getCourses().stream().forEach(course ->{
+				course.getStudents().remove(student);
+				Course courseDb = courseRepository.save(course);
+				System.out.println(courseDb);
+				
+			});
+			
 			
 			studentRepository.delete(student);
 			System.out.println("Estudiante eliminado");
@@ -211,6 +247,8 @@ public class JpaAsociacionesApplication implements CommandLineRunner {
 		scanner.close();
 		
 	}
+	
+	
 	
 	@Transactional
 	public void addStudent() {

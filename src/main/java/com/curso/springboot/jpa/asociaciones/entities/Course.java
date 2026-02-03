@@ -1,14 +1,14 @@
 package com.curso.springboot.jpa.asociaciones.entities;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-
-import org.hibernate.Hibernate;
-
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.Table;
 
 @Entity
@@ -25,11 +25,12 @@ public class Course {
 	
 	private String content;
 	
-	/*private List<Student> students;*/
+	@ManyToMany(fetch = FetchType.EAGER,mappedBy = "courses")
+	private List<Student> students;
 	
 
 	public Course() {
-		
+		students = new ArrayList<>();
 	}
 	
 	public Course(String name, String instructor, String content) {
@@ -38,9 +39,6 @@ public class Course {
 		this.instructor = instructor;
 		this.content = content;
 	}
-
-
-
 
 	public Long getId() {
 		return id;
@@ -76,6 +74,14 @@ public class Course {
 	}
 	
 	
+	public List<Student> getStudents() {
+		return students;
+	}
+
+	public void setStudents(List<Student> students) {
+		this.students = students;
+	}
+
 	@Override
 	public int hashCode() {
 		return Objects.hash(content, id, instructor, name);
